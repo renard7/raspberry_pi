@@ -15,18 +15,21 @@
 int fd;
 int gpio_input;
 
+#define G_IN    24
+#define G_OUT   16
+
 void got_signal (int sig)
 {
   static int n = 0;
   int status, input;
 
   if (n % 2 == 0)
-    status = ioctl (fd, RPI_GPIO_SET, 16);
+    status = ioctl (fd, RPI_GPIO_SET, G_OUT);
   else
-    status = ioctl (fd, RPI_GPIO_CLR, 16);
+    status = ioctl (fd, RPI_GPIO_CLR, G_OUT);
 
-  if ((input = ioctl (fd, RPI_GPIO_READ, 24)) != gpio_input) {
-    printf ("input= %d\n", ioctl (fd, RPI_GPIO_READ, 24));
+  if ((input = ioctl (fd, RPI_GPIO_READ, G_IN)) != gpio_input) {
+    printf ("input= %d\n", ioctl (fd, RPI_GPIO_READ, G_IN));
     gpio_input = input;
   }
 
@@ -53,10 +56,10 @@ void *POSIX_Init()
 
   printf ("fd = %d\n", fd);
 
-  ioctl(fd, RPI_GPIO_IN, 24);
-  ioctl(fd, RPI_GPIO_OUT, 16);
+  ioctl(fd, RPI_GPIO_IN, G_IN);
+  ioctl(fd, RPI_GPIO_OUT, G_OUT);
 
-  gpio_input = ioctl (fd, RPI_GPIO_READ, 24);
+  gpio_input = ioctl (fd, RPI_GPIO_READ, G_IN);
 
   // Set up signal
   sig.sa_flags = 0;
@@ -91,9 +94,6 @@ void *POSIX_Init()
 #define CONFIGURE_APPLICATION_NEEDS_CONSOLE_DRIVER
 #define CONFIGURE_APPLICATION_NEEDS_CLOCK_DRIVER
 #define CONFIGURE_APPLICATION_EXTRA_DRIVERS RPI_GPIO_DRIVER_TABLE_ENTRY
-
-/* include an extra slot for registering the termios one dynamically */
-#define CONFIGURE_MAXIMUM_DRIVERS 3
 
 #define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 5
 

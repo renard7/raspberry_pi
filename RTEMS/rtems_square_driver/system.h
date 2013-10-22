@@ -12,10 +12,23 @@
 
 #include <inttypes.h>
 #include <rtems.h>
+#include "rpi_gpio.h"
 
 /* functions */
 
+rtems_task Init(
+  rtems_task_argument argument
+);
+
+rtems_task Task_Absolute_Period(
+  rtems_task_argument argument
+);
+
 rtems_task Task_Rate_Monotonic_Period(
+  rtems_task_argument argument
+);
+
+rtems_task Task_Relative_Period(
   rtems_task_argument argument
 );
 
@@ -35,8 +48,11 @@ extern rtems_name Task_name[ 2 ];       /* array of task names */
 
 #define CONFIGURE_APPLICATION_NEEDS_CONSOLE_DRIVER
 #define CONFIGURE_APPLICATION_NEEDS_CLOCK_DRIVER
+#define CONFIGURE_APPLICATION_EXTRA_DRIVERS RPI_GPIO_DRIVER_TABLE_ENTRY
 
 #define CONFIGURE_MICROSECONDS_PER_TICK     500   // NB: 10 and lower gives system failure for erc32 simulator
+
+#define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 5
 
 #define CONFIGURE_MAXIMUM_TASKS             10
 
@@ -56,7 +72,6 @@ extern rtems_name Task_name[ 2 ];       /* array of task names */
 
 #include <rtems/confdefs.h>
 
-#if 0
 /*
  *  Handy macros and static inline functions
  */
@@ -108,7 +123,5 @@ extern rtems_name Task_name[ 2 ];       /* array of task names */
 #define task_number( tid ) \
   ( rtems_get_index( tid ) - \
      rtems_configuration_get_rtems_api_configuration()->number_of_initialization_tasks )
-
-#endif
 
 /* end of include file */

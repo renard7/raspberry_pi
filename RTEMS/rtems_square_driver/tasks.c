@@ -7,25 +7,15 @@
 #include "system.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <rtems/error.h>
+#include "rpi_gpio.h"
 
-#define BCM2708_PERI_BASE    0x20000000
-#define GPIO_BASE            (BCM2708_PERI_BASE + 0x200000) /* GPIO controler */
-
-// GPIO setup macros
-#define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
-#define OUT_GPIO(g) *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
-
-#define GPIO_SET *(gpio+7)  // sets   bits which are 1 ignores bits which are 0
-#define GPIO_CLR *(gpio+10) // clears bits which are 1 ignores bits which are 0
-#define GPIO_READ(g) *(gpio+13) &= (1<<(g))
-
-#define GPIO_NR 16 //25
-
-volatile unsigned int *gpio = (unsigned int *)GPIO_BASE;
+//volatile unsigned int *gpio = (unsigned int *)GPIO_BASE;
+int fd;
 
 // Periods for the various tasks
-#define PERIOD_TASK_RATE_MONOTONIC     100 //2000
+#define PERIOD_TASK_RATE_MONOTONIC     100
 
 //
 // Rate Monotonic Scheduling
@@ -40,9 +30,15 @@ rtems_task Task_Rate_Monotonic_Period (rtems_task_argument unused)
 
   period_interval = rtems_clock_get_ticks_per_second() / PERIOD_TASK_RATE_MONOTONIC;
   count = 0;
-  OUT_GPIO(GPIO_NR);
 
   printf ("Period interval: %d tick(s)\n", (int)period_interval);
+
+  if ((fd = open ("/dev/rpi_gpio", O_RDWR)) < 0) {
+    fprintf (stderr, "open error => %d %s\n", errno, strerror(errno));
+    exit (1);
+  }
+
+  ioctl(fd, RPI_GPIO_OUT, 16);
 
   // Init RMS
   my_period_name = rtems_build_name( 'P', 'E', 'R', '1' );
@@ -53,10 +49,10 @@ rtems_task Task_Rate_Monotonic_Period (rtems_task_argument unused)
   }
   
   while( 1 ) {
-    if (count % 2)
-      GPIO_SET = 1 << GPIO_NR;
+    if (count % 2 == 0)
+    	status = ioctl (fd, RPI_GPIO_SET, 16);
     else
-      GPIO_CLR = 1 << GPIO_NR;
+     	status = ioctl (fd, RPI_GPIO_CLR, 16);
 
     count++;
 
@@ -64,8 +60,7 @@ rtems_task Task_Rate_Monotonic_Period (rtems_task_argument unused)
     status = rtems_rate_monotonic_period (RM_period, period_interval);
 
     // Overrun ?
-    if (status == RTEMS_TIMEOUT) {
+    if (status == RTEMS_TIMEOUT)
       printf ("RM missed period !\n");
-    }
   }
 }

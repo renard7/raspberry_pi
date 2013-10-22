@@ -22,12 +22,23 @@ rtems_name Task_name[ 2 ];       /* array of task names */
 rtems_task Init (rtems_task_argument argument)
 {
   rtems_status_code status;
+  rtems_time_of_day time;
   uint32_t ticks_per_second;
 
   puts( "\n\n\n*** RTEMS SQUARE ***" );
 
   ticks_per_second = rtems_clock_get_ticks_per_second();
   printf("\nTicks per second in your system: %" PRIu32 "\n", ticks_per_second);
+
+  time.year   = 1988;
+  time.month  = 12;
+  time.day    = 31;
+  time.hour   = 9;
+  time.minute = 0;
+  time.second = 0;
+  time.ticks  = 0;
+
+  status = rtems_clock_set( &time );
 
   Task_name[ 1 ] = rtems_build_name( 'T', 'A', '1', ' ' );
 

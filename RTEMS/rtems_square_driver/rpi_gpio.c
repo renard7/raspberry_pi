@@ -2,8 +2,10 @@
  * RTEMS GPIO driver for RPi
  */
 #include <rtems.h>
-#include <bsp.h>
 #include "rpi_gpio.h"
+
+#define BCM2708_PERI_BASE    0x20000000
+#define GPIO_BASE            (BCM2708_PERI_BASE + 0x200000) /* GPIO controler */
 
 // GPIO setup macros
 #define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
@@ -13,7 +15,7 @@
 #define GPIO_CLR *(gpio+10) // clears bits which are 1 ignores bits which are 0
 #define GPIO_READ(g) *(gpio+13) &= (1<<(g))
 
-static volatile unsigned int *gpio = (unsigned int *)BCM2835_GPIO_REGS_BASE;
+volatile unsigned int *gpio = (unsigned int *)GPIO_BASE;
 
 static char initialized;
 
