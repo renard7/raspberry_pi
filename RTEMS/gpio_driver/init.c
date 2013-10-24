@@ -16,7 +16,7 @@ int fd;
 int gpio_input;
 
 #define G_IN    24
-#define G_OUT   16
+#define G_OUT   25
 
 void got_signal (int sig)
 {
@@ -80,7 +80,7 @@ void *POSIX_Init()
   ti.it_value.tv_sec = 0;
   ti.it_value.tv_nsec = 5000000;
   ti.it_interval.tv_sec = 0;
-  ti.it_interval.tv_nsec = 200000000; // 200 ms
+  ti.it_interval.tv_nsec = 10000000;
 
   timer_settime(myTimer, 0, &ti, &ti_old);
 
