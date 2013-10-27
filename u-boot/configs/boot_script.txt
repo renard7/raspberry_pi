@@ -1,0 +1,5 @@
+usb start
+setenv bootfile uImage.rpi
+run nfsargs
+dhcp
+bootm

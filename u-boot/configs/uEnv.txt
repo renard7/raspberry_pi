@@ -1,0 +1,4 @@
+serverip=192.168.2.1
+mmcargs=setenv bootargs 'dma.dmachans=0x7f35 bcm2708_fb.fbwidth=656 bcm2708_fb.fbheight=416 bcm2708.boardrev=0x4 bcm2708.serial=0x22849ed smsc95xx.macaddr=B8:27:EB:28:49:ED sdhci-bcm2708.emmc_clock_freq=100000000 vc_mem.mem_base=0x8000000 vc_mem.mem_size=0x10000000  dwc_otg.lpm_enable=0 console=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait'
+nfsargs=setenv bootargs 'dma.dmachans=0x7f35 bcm2708_fb.fbwidth=656 bcm2708_fb.fbheight=416 bcm2708.boardrev=0x4 bcm2708.serial=0x22849ed sdhci-bcm2708.emmc_clock_freq=100000000 vc_mem.mem_base=0x8000000 vc_mem.mem_size=0x10000000  dwc_otg.lpm_enable=0 console=ttyAMA0,115200 root=/dev/nfs rootfstype=nfs elevator=deadline nfsroot=${serverip}:/home/pierre/rootfs_rpi ip=dhcp'
+
